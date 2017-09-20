@@ -1,13 +1,18 @@
 # Unity Road Generator
 
 A Road Generation tool for Unity using Catmul-Rom splines.
+
 Spline implementation was taken and adapted from: https://github.com/nickhall/Unity-Procedural
+
 Includes a Unity port of MIConvexHull, under the MIT License.
 
 Features: 
   Mesh Generation from Spline Points
+  
   Road Width, Thickness and Resolution
+  
   Edge Generation - Width, Thickness
+  
   Debug Mode (Gizmos for spline, normals per point, edge gizmos)
   
   Generated Road with Spline Gizmo
