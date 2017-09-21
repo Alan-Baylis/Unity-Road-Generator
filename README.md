@@ -33,4 +33,10 @@ Features:
     
   Edge Width 
     ![Alt text](https://image.prntscr.com/image/6NPxRW2RRZq7F9njJZOckw.png "Edge Width")
+    
+    Roadmap:
+    
+    AI Waypoints
+    
+    Starting Line
 
