@@ -38,5 +38,5 @@ Features:
     
     AI Waypoints
     
-    Starting Line
+    Finish Line
 
