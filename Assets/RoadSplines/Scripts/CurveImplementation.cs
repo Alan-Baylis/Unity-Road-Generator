@@ -32,6 +32,9 @@ public class CurveImplementation : MonoBehaviour
 
     private bool ClosedLoop = true;
 
+    public List<Vector3> waypoints;
+    public float waypointResolution;
+
 
     void Update()
     {
@@ -45,6 +48,7 @@ public class CurveImplementation : MonoBehaviour
             points.Clear();
             inner.Clear();
             outer.Clear();
+            waypoints.Clear();
         }
 
         Vector3 p0;
@@ -157,6 +161,24 @@ public class CurveImplementation : MonoBehaviour
                     }
 
                 }
+
+                for (int j = 0; j < waypointResolution; j++)
+                {
+                    t = j * 1.0f / waypointResolution;
+                    Vector3 tangent;
+                    position = CatmullRom.Interpolate(p0, p1, m0, m1, t, out tangent);
+                
+                    if (debug) //Waypoints
+                    {
+                        Debug.DrawLine(position, position + new Vector3(0, 25, 0), Color.blue);
+                    }
+
+                    if (store)
+                    {
+                        waypoints.Add(position);
+                    }
+                
+                }
             }
 
             for (int i = 0; i < CurveCoordinates.Length - 1; ++i)
@@ -175,6 +197,22 @@ public class CurveImplementation : MonoBehaviour
             {
                 Gizmos.DrawWireCube(CurveCoordinates[i] + transform.position, new Vector3(.1f, .1f, .1f));
             }
+
+            for (int i = 0; i < waypoints.Count; i++)
+            {
+                Gizmos.DrawWireSphere(waypoints[i] + new Vector3 (0, 25, 0), 2);
+                
+                if (i == waypoints.Count-1)
+                {
+                    Debug.DrawLine(waypoints[i] + new Vector3(0, 25, 0), waypoints[0] + new Vector3(0, 25, 0), Color.blue);
+                }
+                else
+                {
+                    Debug.DrawLine(waypoints[i] + new Vector3(0, 25, 0), waypoints[i+1] + new Vector3(0, 25, 0), Color.blue);
+                }
+            }
+
+            
         }
     }
 
