@@ -13,13 +13,20 @@ Features:
   
   Edge Generation - Width, Thickness
   
+  AI Waypoints
+  
   Debug Mode (Gizmos for spline, normals per point, edge gizmos)
+  
+  
   
   Generated Road with Spline Gizmo
   ![Alt text](https://image.prntscr.com/image/emmQqxtZRFuMPOUvnSutcA.png "Generated Road with Spline Gizmo")
   
   Detachable Edges (Separate Mesh)
   ![Alt text](https://image.prntscr.com/image/UUPNTdGrT5iRkhkpREV9Ww.png "Detachable Edges")
+  
+  AI Waypoints
+  ![Alt text](https://image.prntscr.com/image/Q0xrBsTbSNW6RRmortuvrA.png "AI Waypoints")
   
   Debug Mode - Blue Line is road Path, Red lines are normals to each subpoint (where the road goes), Green lines are edges
   ![Alt text](https://image.prntscr.com/image/zG6sf65ERf_rZODSvssItA.png "Debug Mode")
@@ -36,7 +43,7 @@ Features:
     
     Roadmap:
     
-    AI Waypoints
+    AI Waypoints - WIP
     
     Finish Line
 
