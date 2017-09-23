@@ -15,7 +15,7 @@ Includes a Unity port of MIConvexHull, under the MIT License.
   
     AI Waypoints
   
-    Debug Mode (Gizmos for spline, normals per point, edge gizmos)
+    Debug Mode (Gizmos for spline, normals per point, edge gizmos, waypoint visualization)
   
 # Images  
   
