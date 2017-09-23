@@ -6,18 +6,18 @@ Spline implementation was taken and adapted from: https://github.com/nickhall/Un
 
 Includes a Unity port of MIConvexHull, under the MIT License.
 
-Features: 
-  Mesh Generation from Spline Points
+# Features
+    Mesh Generation from Spline Points
   
-  Road Width, Thickness and Resolution
+    Road Width, Thickness and Resolution
   
-  Edge Generation - Width, Thickness
+    Edge Generation - Width, Thickness
   
-  AI Waypoints
+    AI Waypoints
   
-  Debug Mode (Gizmos for spline, normals per point, edge gizmos)
+    Debug Mode (Gizmos for spline, normals per point, edge gizmos)
   
-  
+# Images  
   
   Generated Road with Spline Gizmo
   ![Alt text](https://image.prntscr.com/image/emmQqxtZRFuMPOUvnSutcA.png "Generated Road with Spline Gizmo")
@@ -39,11 +39,11 @@ Features:
   ![Alt text](https://image.prntscr.com/image/DZRSgZU8SWur_kdz6byeBg.png "Resolution")
     
   Edge Width 
-    ![Alt text](https://image.prntscr.com/image/6NPxRW2RRZq7F9njJZOckw.png "Edge Width")
+  ![Alt text](https://image.prntscr.com/image/6NPxRW2RRZq7F9njJZOckw.png "Edge Width")
     
-    Roadmap:
+    # Roadmap
     
-    AI Waypoints - WIP
+        AI Waypoints - WIP
     
-    Finish Line
+        Finish Line
 
