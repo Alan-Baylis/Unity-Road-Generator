@@ -6,23 +6,18 @@ using System.Collections.Generic;
 [ExecuteInEditMode()]
 public class CurveImplementation : MonoBehaviour
 {
-
-    private List<GameObject> roadPieces = new List<GameObject>(); //Used for single mesh generation
-    private List<GameObject> outerPieces = new List<GameObject>(); //Used for single mesh generation
-    private List<GameObject> innerPieces = new List<GameObject>(); //Used for single mesh generation
-
-
     private List<Vector3> points = new List<Vector3>(); //All points of the spline
 
     private List<Vector3> inner = new List<Vector3>(); //All points of the spline
     private List<Vector3> outer = new List<Vector3>(); //All points of the spline
 
-
+    public bool drawEdges;
+    public bool generateWaypoints;
 
     private Vector3[] CurveCoordinates;
     private Vector3[] Tangents;
 
-    public List<GameObject> Points;
+    public List<GameObject> ControlPoints;
     public int CurveResolution = 10;
     public float extrude;
     public float edgeWidth;
@@ -48,7 +43,9 @@ public class CurveImplementation : MonoBehaviour
             points.Clear();
             inner.Clear();
             outer.Clear();
-            waypoints.Clear();
+
+            if (generateWaypoints)
+                waypoints.Clear();
         }
 
         Vector3 p0;
@@ -60,11 +57,11 @@ public class CurveImplementation : MonoBehaviour
 
         if (ClosedLoop == true)
         {
-            pointsToMake = (CurveResolution) * (Points.Count);
+            pointsToMake = (CurveResolution) * (ControlPoints.Count);
         }
         else
         {
-            pointsToMake = (CurveResolution) * (Points.Count - 1);
+            pointsToMake = (CurveResolution) * (ControlPoints.Count - 1);
         }
 
         if (pointsToMake > 0) //Prevent Number Overflow
@@ -75,10 +72,10 @@ public class CurveImplementation : MonoBehaviour
             int closedAdjustment = ClosedLoop ? 0 : 1;
 
             // First for loop goes through each individual control point and connects it to the next, so 0-1, 1-2, 2-3 and so on
-            for (int i = 0; i < Points.Count - closedAdjustment; i++)
+            for (int i = 0; i < ControlPoints.Count - closedAdjustment; i++)
             {
-                p0 = Points[i].transform.position;
-                p1 = (ClosedLoop == true && i == Points.Count - 1) ? Points[0].transform.position : Points[i + 1].transform.position;
+                p0 = ControlPoints[i].transform.position;
+                p1 = (ClosedLoop == true && i == ControlPoints.Count - 1) ? ControlPoints[0].transform.position : ControlPoints[i + 1].transform.position;
 
                 // Tangent calculation for each control point
                 // Tangent M[k] = (P[k+1] - P[k-1]) / 2
@@ -87,34 +84,34 @@ public class CurveImplementation : MonoBehaviour
                 // m0
                 if (i == 0)
                 {
-                    m0 = ClosedLoop ? 0.5f * (p1 - Points[Points.Count - 1].transform.position) : p1 - p0;
+                    m0 = ClosedLoop ? 0.5f * (p1 - ControlPoints[ControlPoints.Count - 1].transform.position) : p1 - p0;
                 }
                 else
                 {
-                    m0 = 0.5f * (p1 - Points[i - 1].transform.position);
+                    m0 = 0.5f * (p1 - ControlPoints[i - 1].transform.position);
                 }
 
                 // m1
                 if (ClosedLoop)
                 {
-                    if (i == Points.Count - 1)
+                    if (i == ControlPoints.Count - 1)
                     {
-                        m1 = 0.5f * (Points[(i + 2) % Points.Count].transform.position - p0);
+                        m1 = 0.5f * (ControlPoints[(i + 2) % ControlPoints.Count].transform.position - p0);
                     }
                     else if (i == 0)
                     {
-                        m1 = 0.5f * (Points[i + 2].transform.position - p0);
+                        m1 = 0.5f * (ControlPoints[i + 2].transform.position - p0);
                     }
                     else
                     {
-                        m1 = 0.5f * (Points[(i + 2) % Points.Count].transform.position - p0);
+                        m1 = 0.5f * (ControlPoints[(i + 2) % ControlPoints.Count].transform.position - p0);
                     }
                 }
                 else
                 {
-                    if (i < Points.Count - 2)
+                    if (i < ControlPoints.Count - 2)
                     {
-                        m1 = 0.5f * (Points[(i + 2) % Points.Count].transform.position - p0);
+                        m1 = 0.5f * (ControlPoints[(i + 2) % ControlPoints.Count].transform.position - p0);
                     }
                     else
                     {
@@ -126,7 +123,7 @@ public class CurveImplementation : MonoBehaviour
                 float t;
                 float pointStep = 1.0f / CurveResolution;
 
-                if ((i == Points.Count - 2 && ClosedLoop == false) || (i == Points.Count - 1 && ClosedLoop))
+                if ((i == ControlPoints.Count - 2 && ClosedLoop == false) || (i == ControlPoints.Count - 1 && ClosedLoop))
                 {
                     pointStep = 1.0f / (CurveResolution - 1);
                     // last point of last segment should reach p1
@@ -168,12 +165,12 @@ public class CurveImplementation : MonoBehaviour
                     Vector3 tangent;
                     position = CatmullRom.Interpolate(p0, p1, m0, m1, t, out tangent);
                 
-                    if (debug) //Waypoints
+                    if (debug && generateWaypoints) //Waypoints
                     {
                         Debug.DrawLine(position, position + new Vector3(0, 25, 0), Color.blue);
                     }
 
-                    if (store)
+                    if (store && generateWaypoints)
                     {
                         waypoints.Add(position);
                     }
@@ -181,6 +178,7 @@ public class CurveImplementation : MonoBehaviour
                 }
             }
 
+            //Curve line
             for (int i = 0; i < CurveCoordinates.Length - 1; ++i)
             {
                 Debug.DrawLine(CurveCoordinates[i] + transform.position, CurveCoordinates[i + 1] + transform.position, Color.cyan);
@@ -192,24 +190,30 @@ public class CurveImplementation : MonoBehaviour
     {
         if (debug)
         {
-            Gizmos.color = Color.cyan;
-            for (int i = 0; i < CurveCoordinates.Length; i++)
+            if (generateWaypoints)
             {
-                Gizmos.DrawWireCube(CurveCoordinates[i] + transform.position, new Vector3(.1f, .1f, .1f));
+                //Waypoints
+                for (int i = 0; i < waypoints.Count; i++)
+                {
+                    Gizmos.color = Color.cyan;
+                    Gizmos.DrawWireSphere(waypoints[i] + new Vector3(0, 25, 0), 2);
+
+                    if (i == waypoints.Count - 1)
+                    {
+                        Debug.DrawLine(waypoints[i] + new Vector3(0, 25, 0), waypoints[0] + new Vector3(0, 25, 0), Color.blue);
+                    }
+                    else
+                    {
+                        Debug.DrawLine(waypoints[i] + new Vector3(0, 25, 0), waypoints[i + 1] + new Vector3(0, 25, 0), Color.blue);
+                    }
+                }
             }
 
-            for (int i = 0; i < waypoints.Count; i++)
+            //Control Point Gizmo
+            Gizmos.color = Color.cyan;
+            for (int i = 0; i < ControlPoints.Count; i++)
             {
-                Gizmos.DrawWireSphere(waypoints[i] + new Vector3 (0, 25, 0), 2);
-                
-                if (i == waypoints.Count-1)
-                {
-                    Debug.DrawLine(waypoints[i] + new Vector3(0, 25, 0), waypoints[0] + new Vector3(0, 25, 0), Color.blue);
-                }
-                else
-                {
-                    Debug.DrawLine(waypoints[i] + new Vector3(0, 25, 0), waypoints[i+1] + new Vector3(0, 25, 0), Color.blue);
-                }
+                Gizmos.DrawSphere(ControlPoints[i].transform.position, extrude/2);
             }
 
             
@@ -226,98 +230,23 @@ public class CurveImplementation : MonoBehaviour
                 DestroyImmediate(transform.GetChild(i).gameObject);
         }
 
-        innerPieces.Clear();
-        outerPieces.Clear();
-        roadPieces.Clear();
-
-        int[] previous = new int[3];
-
-        for (int i = 0; i < (CurveResolution * Points.Count) - 1; i++)
-        {
-            List<Vector3> pointarinos = new List<Vector3>();
-            pointarinos.Clear();
-
-                if (i == 0)
-                {
-                    pointarinos.Add(points[0]);
-                    pointarinos.Add(points[1]);
-                    pointarinos.Add(points[2]);
-                    pointarinos.Add(points[3]);
-                    pointarinos.Add(points[4]);
-                    pointarinos.Add(points[5]);
-
-                    previous = new int[]
-                    {
-                        3, 4, 5
-                    };
-                }
-                else if (i < points.Count - 3)
-                {
-                    pointarinos.Add(points[previous[0]]);
-                    pointarinos.Add(points[previous[1]]);
-                    pointarinos.Add(points[previous[2]]);
-                    pointarinos.Add(points[previous[2] + 1]);
-                    pointarinos.Add(points[previous[2] + 2]);
-                    pointarinos.Add(points[previous[2] + 3]);
-
-                    previous = new int[]
-                    {
-                        previous[2] + 1, previous[2] + 2, previous[2] + 3
-                    };
-                } 
-                else
-                {
-                    pointarinos.Add(points[points.Count - 2]);
-                    pointarinos.Add(points[points.Count - 1]);
-                    pointarinos.Add(points[points.Count]);
-                    pointarinos.Add(points[0]);
-                    pointarinos.Add(points[1]);
-                    pointarinos.Add(points[2]);
-                }
-           
-            List<Vector3> lower = new List<Vector3>(pointarinos);
-                                  
-            for (int z = 0; z < lower.Count; z++)
-            {
-                lower[z] -= new Vector3(0, thickness, 0);
-            }
-
-            pointarinos.AddRange(lower);
-
-            Mesh mesh = new Mesh();
-
-            mesh = MeshMaker.MeshFromPoints(pointarinos);
-
-            GameObject obj = new GameObject();
-
-            MeshFilter filter = obj.AddComponent<MeshFilter>();
-            MeshRenderer rend = obj.AddComponent<MeshRenderer>();
-
-            rend.sharedMaterial = new Material(Shader.Find("Standard"));
-            rend.sharedMaterial.color = Color.black;
-            filter.sharedMesh = LowPolyConverter.Convert(mesh);
-            
-            roadPieces.Add(obj);
-        }
-
-        Mesh combinedMesh = CombineMeshes.Combine(roadPieces);
+        Mesh combinedMesh = EdgeExtruder.LinearMesh(points, CurveResolution * ControlPoints.Count, thickness, 3);
 
         GetComponent<MeshFilter>().sharedMesh = combinedMesh;
 
-        foreach (GameObject obj in roadPieces)
-        {
-            DestroyImmediate(obj);
-        }
 
-        DrawInner();
-        DrawOuter();
+        if (drawEdges)
+        {
+            DrawInner();
+            DrawOuter();
+        }
 
     }
 
 
     private void DrawInner()
     {
-        Mesh mesh = EdgeExtruder.LinearMesh(inner, CurveResolution * Points.Count, thickness);
+        Mesh mesh = EdgeExtruder.LinearMesh(inner, CurveResolution * ControlPoints.Count, thickness, 2);
 
         GameObject piece = new GameObject("Inner Edge");
 
@@ -333,7 +262,7 @@ public class CurveImplementation : MonoBehaviour
 
     private void DrawOuter()
     {
-        Mesh mesh = EdgeExtruder.LinearMesh(outer, CurveResolution * Points.Count, thickness);
+        Mesh mesh = EdgeExtruder.LinearMesh(outer, CurveResolution * ControlPoints.Count, thickness, 2);
 
         GameObject piece = new GameObject("Outer Edge");
 
