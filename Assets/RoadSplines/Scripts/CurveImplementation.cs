@@ -11,24 +11,26 @@ public class CurveImplementation : MonoBehaviour
     private List<Vector3> inner = new List<Vector3>(); //All points of the spline
     private List<Vector3> outer = new List<Vector3>(); //All points of the spline
 
-    public bool drawEdges;
-    public bool generateWaypoints;
+    public bool drawEdges = true;
 
     private Vector3[] CurveCoordinates;
     private Vector3[] Tangents;
 
     public List<GameObject> ControlPoints;
     public int CurveResolution = 10;
-    public float extrude;
-    public float edgeWidth;
-    public float thickness;
+    public float extrude = 10;
+    public float edgeWidth = 2;
+    public float thickness = 1;
 
     public bool debug = true;
 
     private bool ClosedLoop = true;
 
-    public List<Vector3> waypoints;
-    public float waypointResolution;
+    [HideInInspector]
+    public List<Vector3> waypoints = new List<Vector3>();
+
+    public bool generateWaypoints = true;
+    public float waypointResolution = 5;
 
 
     void Update()
